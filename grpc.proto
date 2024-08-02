@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package grpc;
+//go-module-name указывается при инициализацию go.mod и так же в нём указывается
+option go_package = "<go-module-name>/protobuf/grpc";
+
+message EmgActivity{
+    repeated double level = 1;
+}
+
+message EmgLable{
+    repeated bool level = 1;
+}
+
+message AngleInJoint{
+    repeated double angle = 1;
+}
+
+message AnglesAndPositions{
+    double xAngle = 1;
+    // измеренная скорость угла наклона по оси x, градусы в секунду
+    double yAngle = 2;
+    // измеренная скорость угла наклона по оси y, градусы в секунду
+    double zAngle = 3;
+    // измеренная скорость угла наклона по оси z, градусы в секунду
+    double xPosition = 4;
+    // измерение будет указываться в метрах
+    double yPosition = 5;
+    // измерение будет указываться в метрах
+    double zPosition = 6;
+    // измерение будет указываться в метрах
+}
+
+// Пакеты которые используются в репозитории smart-glove-proto
+message EmgPack{
+  repeated uint32 data = 1;
+  uint64 time_microseconds = 2; 
+}
+
+message IMUPack{
+  repeated IMU data = 1;
+  uint64 time_microseconds = 2; 
+}
+
+message RawEmgDataBatch{
+  repeated EmgPack data_mes = 1;
+}
+
+message RadIMUDataBatch{
+  repeated IMUPack data_mes = 1;
+}
+
+// В качетсве ответа grpc клиента
+message StatusResponse{
+    string status = 1;
+}
+
+enum MessageGRPCType {
+  emg_activity = 0;
+  emg_lable = 1;
+  angle_in_joint = 2;
+  angles_and_positions = 3;
+  // Пакеты из smart-glove-proto  >
+  emg_pack = 4;
+  imu_pack = 5;
+  raw_emg_data_batch = 6;
+  raw_imu_data_batch = 7;
+}
+
+message MessageWithoutCRC {
+  bytes msg = 1;
+  MessageGRPCType type = 2;
+} 
+
+service Touch {
+  // Отправление сообщений по gRPC
+  rpc SentMessage (MessageWithoutCRC) returns (StatusResponse);
+}
+
+
+message IMU{
+  uint32 number = 1; 
+  // в перчатке может быть до 12 IMU
+  double xAccel = 2;
+  // измеренное ускорение по оси x, g
+  double yAccel = 3;
+  // измеренное ускорение по оси y, g
+  float zAccel = 4;
+  // измеренное ускорение по оси z, g
+  float xAngle = 5;
+  // измеренная скорость угла наклона по оси x, градусы в секунду
+  float yAngle = 6;
+  // измеренная скорость угла наклона по оси y, градусы в секунду
+  float zAngle = 7;
+  // измеренная скорость угла наклона по оси z, градусы в секунду
+  string connectionPin = 8;
+  // Пин (порт на плате, CS) к которому будет крепиться датчик IMU
+  uint32 board_number = 9;
+  // перчатка использует два микроконтроллера
+}
