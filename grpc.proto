@@ -75,8 +75,8 @@ message MessageWithoutCRC {
 service Touch {
   // Отправление сообщений по gRPC
   rpc SentMessage (MessageWithoutCRC) returns (StatusResponse);
-  // От websoket в grpc (от контроллера сервису по распердеению )
-  rpc StreamData (StatusResponse) returns (MessageWithoutCRC);
+  // Стриминг данных через grpc stream внешним сервисам
+  rpc StreamData (StatusResponse) returns (stream MessageWithoutCRC);
 }
 
 
